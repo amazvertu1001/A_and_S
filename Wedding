@@ -1,0 +1,48 @@
+from pathlib import Path
+import re
+
+src = Path("/mnt/data/burgundy_romance_wedding_invitation_foto_mempelai_sejajar.html")
+out = Path("/mnt/data/wedding_invitation_makna_studio_EDIT_MUDAH.html")
+html = src.read_text(encoding="utf-8")
+
+# Add editable background color controls in the existing centralized config.
+html = html.replace(
+"""        const INVITATION_CONFIG = {
+            // A. UBAH LAGU MP3 DI SINI""",
+"""        const INVITATION_CONFIG = {
+            // =========================================================
+            // PANEL EDIT MUDAH — ubah nilai di bagian ini saja
+            // =========================================================
+            // WARNA LATAR: gunakan kode HEX, contoh '#3D0C17' (burgundy)
+            backgroundColor: '#1D040A',
+            coverBackgroundColor: '#3D0C17',
+
+            // A. UBAH LAGU MP3 DI SINI"""
+)
+
+# Make CSS background colors read from the configuration values.
+html = html.replace(
+"""            document.getElementById('floral-top-left').src = INVITATION_CONFIG.floralTopLeft;""",
+"""            // Terapkan warna latar dari PANEL EDIT MUDAH
+            document.body.style.backgroundColor = INVITATION_CONFIG.backgroundColor;
+            const openingCover = document.getElementById('opening-cover');
+            if (openingCover) openingCover.style.backgroundColor = INVITATION_CONFIG.coverBackgroundColor;
+
+            document.getElementById('floral-top-left').src = INVITATION_CONFIG.floralTopLeft;"""
+)
+
+# Add clear guide for replacing corner florals and song.
+html = html.replace(
+"""            // B. UBAH GAMBAR BUNGA DI SISI UNDANGAN DI SINI (Bisa diganti path PNG/SVG Anda seperti 'assets/images/bunga-kiri.png')""",
+"""            // B. BUNGA SUDUT / ORNAMEN
+            // Ganti DEFAULT_FLORAL_LEFT / RIGHT di bawah dengan path file PNG/SVG,
+            // misalnya: 'assets/images/bunga-kiri.png' atau 'assets/images/bunga-kanan.png'"""
+)
+html = html.replace(
+"""            // C. UBAH BUNGA KECIL YANG BERJATUHAN DI SINI""",
+"""            // C. BUNGA KECIL BERJATUHAN (opsional)
+"""
+)
+
+out.write_text(html, encoding="utf-8")
+print(f"File edit mudah dibuat: {out} | {out.stat().st_size:,} bytes")
